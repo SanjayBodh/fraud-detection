@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Credit Card Registration & Login Demo</title>
+  <style>
+    :root{
+      --bg:#0f172a;          /* slate-900 */
+      --card:#111827;        /* gray-900 */
+      --muted:#94a3b8;       /* slate-400 */
+      --text:#e5e7eb;        /* gray-200 */
+      --accent:#22d3ee;      /* cyan-400 */
+      --accent-2:#a78bfa;    /* violet-400 */
+      --danger:#f87171;      /* rose-400 */
+      --success:#34d399;     /* emerald-400 */
+      --shadow:0 10px 25px rgba(0,0,0,.35);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(1200px 800px at 80% -10%, rgba(34,211,238,.08), transparent),
+                  radial-gradient(800px 600px at 0% 100%, rgba(167,139,250,.08), transparent), var(--bg);
+      color:var(--text);
+    }
+    header{
+      position:sticky; top:0; z-index:10;
+      background:rgba(17,24,39,.8);
+      backdrop-filter: blur(8px);
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .nav{max-width:980px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; padding:12px 16px}
+    .brand{display:flex; gap:10px; align-items:center; font-weight:700}
+    .logo{
+      width:34px; height:34px; border-radius:10px;
+      background: conic-gradient(from 120deg, var(--accent), var(--accent-2));
+      box-shadow:0 0 0 3px rgba(255,255,255,.06) inset;
+    }
+    .tabs{display:flex; gap:6px}
+    .tab{
+      border:1px solid rgba(255,255,255,.12);
+      color:var(--text); background:transparent; padding:8px 12px; border-radius:999px; cursor:pointer;
+      transition:.2s ease; font-weight:600; letter-spacing:.2px
+    }
+    .tab[aria-current="page"], .tab:hover{background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.2)}
+
+    main{max-width:980px; margin:28px auto; padding:0 16px}
+    .grid{display:grid; grid-template-columns:1fr; gap:18px}
+
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px solid rgba(255,255,255,.09);
+      border-radius:var(--radius);
+      padding:22px; box-shadow:var(--shadow)
+    }
+    .title{margin:0 0 6px; font-size:22px}
+    .sub{margin:0 0 18px; color:var(--muted)}
+
+    form{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+    .row-1{grid-column: span 1}
+    .row-2{grid-column: span 2}
+
+    label{font-size:13px; color:var(--muted)}
+    input, select{
+      width:100%; margin-top:6px; padding:12px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.12);
+      background:rgba(2,6,23,.6); color:var(--text); outline:none; transition:.2s ease; font-size:15px
+    }
+    input:focus{border-color:var(--accent); box-shadow:0 0 0 3px rgba(34,211,238,.15)}
+
+    .hint{font-size:12px; color:var(--muted); margin-top:4px}
+    .error{color:var(--danger); font-size:13px; margin-top:8px}
+    .success{color:var(--success); font-size:13px; margin-top:8px}
+
+    .actions{display:flex; gap:10px; align-items:center; margin-top:8px}
+    .btn{
+      padding:12px 16px; border:none; border-radius:12px; cursor:pointer; font-weight:700; letter-spacing:.2px;
+      background:linear-gradient(135deg, var(--accent), var(--accent-2)); color:#05101a; box-shadow:var(--shadow)
+    }
+    .btn.secondary{background:transparent; color:var(--text); border:1px solid rgba(255,255,255,.18)}
+
+    .cc-preview{
+      margin-top:8px; padding:18px; border-radius:16px; background:linear-gradient(135deg, rgba(34,211,238,.12), rgba(167,139,250,.12));
+      border:1px dashed rgba(255,255,255,.18); font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace
+    }
+
+    .profile-row{display:grid; grid-template-columns:160px 1fr; gap:10px; padding:10px 0; border-bottom:1px dashed rgba(255,255,255,.08)}
+    .profile-row:last-child{border-bottom:none}
+
+    footer{max-width:980px; margin:36px auto 24px; padding:0 16px; color:var(--muted); font-size:12px}
+
+    @media (max-width:720px){
+      form{grid-template-columns:1fr}
+      .row-2{grid-column: span 1}
+      .profile-row{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="nav">
+      <div class="brand"><div class="logo"></div> <span>Card Portal</span></div>
+      <div class="tabs">
+        <button class="tab" data-route="#register" aria-current="page">Register</button>
+        <button class="tab" data-route="#login">Login</button>
+        <button class="tab" data-route="#profile">Profile</button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <div class="grid">
+
+      <!-- Register -->
+      <section id="register" class="card">
+        <h2 class="title">Register Your Card</h2>
+        <p class="sub">Demo-only. Do not use real card details. CVV is never stored.</p>
+        <form id="registerForm" novalidate>
+          <div class="row-1">
+            <label>Full Name
+              <input type="text" id="reg_name" placeholder="e.g., Sanjay Bodh" required>
+            </label>
+          </div>
+          <div class="row-1">
+            <label>Email
+              <input type="email" id="reg_email" placeholder="you@example.com" required>
+            </label>
+          </div>
+          <div class="row-2">
+            <label>Card Number
+              <input type="text" id="reg_card" inputmode="numeric" maxlength="19" placeholder="xxxx xxxx xxxx xxxx" required>
+              <div class="hint">We run check and store only the last 4 digits.</div>
+            </label>
+          </div>
+          <div class="row-1">
+            <label>Expiry (MM/YY)
+              <input type="text" id="reg_exp" inputmode="numeric" maxlength="5" placeholder="MM/YY" required>
+            </label>
+          </div>
+          <div class="row-1">
+            <label>CVV
+              <input type="password" id="reg_cvv" inputmode="numeric" maxlength="4" placeholder="***" required>
+              <div class="hint">For validation only, not stored.</div>
+            </label>
+          </div>
+          <div class="row-1">
+            <label>Password
+              <input type="password" id="reg_pass" minlength="6" placeholder="Min 6 characters" required>
+            </label>
+          </div>
+          <div class="row-1">
+            <label>Confirm Password
+              <input type="password" id="reg_pass2" minlength="6" placeholder="Re-enter password" required>
+            </label>
+          </div>
+          <div class="row-2">
+            <label style="display:flex; align-items:center; gap:8px">
+              <input type="checkbox" id="reg_terms" style="width:auto"> I agree this is a demo and not a real payment system.
+            </label>
+          </div>
+          <div class="row-2 actions">
+            <button class="btn" type="submit">Create Account</button>
+            <button class="btn secondary" type="button" onclick="go('#login')">Already have an account?</button>
+          </div>
+          <div id="reg_msg" class="hint"></div>
+        </form>
+        <div class="cc-preview" id="cc_preview">•••• •••• •••• ••••</div>
+      </section>
+
+      <!-- Login -->
+      <section id="login" class="card" hidden>
+        <h2 class="title">Login</h2>
+        <p class="sub">Use the email and password you registered with.</p>
+        <form id="loginForm" novalidate>
+          <div class="row-2">
+            <label>Email
+              <input type="email" id="log_email" placeholder="you@example.com" required>
+            </label>
+          </div>
+          <div class="row-2">
+            <label>Password
+              <input type="password" id="log_pass" minlength="6" placeholder="Your password" required>
+            </label>
+          </div>
+          <div class="row-2 actions">
+            <button class="btn" type="submit">Login</button>
+            <button class="btn secondary" type="button" onclick="go('#register')">Create an account</button>
+          </div>
+          <div id="log_msg" class="hint"></div>
+        </form>
+      </section>
+
+      <!-- Profile -->
+      <section id="profile" class="card" hidden>
+        <h2 class="title">Your Profile</h2>
+        <p class="sub">Below is what we keep on file (demo storage using your browser).</p>
+        <div id="profileWrap">
+          <!-- Filled by JS -->
+        </div>
+        <div class="actions" style="margin-top:16px">
+          <button class="btn" type="button" onclick="logout()">Logout</button>
+        </div>
+      </section>
+
+      <!-- Diagnostics & Tests -->
+      <section id="tests" class="card">
+        <h2 class="title">Diagnostics & Tests</h2>
+        <p class="sub">These lightweight tests verify routing fallbacks and validators (Luhn, expiry, masking). They run in-browser and do not send data anywhere.</p>
+        <div class="actions">
+          <button class="btn" type="button" onclick="runTests()">Run Tests</button>
+          <button class="btn secondary" type="button" onclick="resetDemo()">Reset Demo Data</button>
+        </div>
+        <div id="test_output" class="cc-preview" style="margin-top:12px; white-space:pre-wrap">(no tests run yet)</div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer>
+    <strong>Security note:</strong> This is a front‑end code designed by sanjay bodh and shivam<code>.
+  </footer>
+
+  <script>
+  
+    function canUsePushState(){
+      try {
+       
+        if (!('history' in window) || !('pushState' in history)) return false;
+        const url = String(document.URL || location.href || '');
+        if (url.startsWith('about:')) return false;
+        
+        const old = location.hash;
+        try { history.pushState(null, '', old || '#'); history.replaceState(null, '', old || '#'); }
+        catch (_) { return false; }
+        return true;
+      } catch (e) { return false; }
+    }
+
+    const USE_PUSH_STATE = canUsePushState();
+
+    function go(hash){
+      if (!hash || typeof hash !== 'string') hash = '#register';
+      if (hash === location.hash) { renderRoute(); return; }
+      if (USE_PUSH_STATE) {
+        try { history.pushState(null, '', hash); }
+        catch (_) { location.hash = hash; }
+      } else {
+        location.hash = hash;
+      }
+      
+      renderRoute();
+    }
+
+    function show(sectionId){
+      for(const sec of document.querySelectorAll('main section')){
+        sec.hidden = sec.id !== sectionId;
+      }
+      document.querySelectorAll('.tab').forEach(btn=>{
+        btn.setAttribute('aria-current', btn.dataset.route === '#' + sectionId ? 'page' : 'false');
+      });
+    }
+
+    function renderRoute(){
+      let hash = location.hash || '#register';
+      if (!location.hash) { // set default without pushState to avoid sandbox errors
+        location.hash = '#register';
+        hash = '#register';
+      }
+      const section = hash.replace('#','');
+      // Profile requires auth
+      if(section === 'profile' && !getSession()){
+        show('login');
+      } else {
+        show(section);
+        if(section === 'profile') renderProfile();
+      }
+    }
+
+    // Event listeners for both strategies
+    if (USE_PUSH_STATE) {
+      window.addEventListener('popstate', renderRoute);
+    }
+    window.addEventListener('hashchange', renderRoute);
+
+    // ---------------------- Utilities ----------------------
+    function maskCard(num){
+      const last4 = (num || '').replace(/\D/g,'').slice(-4).padStart(4,'•');
+      return `•••• •••• •••• ${last4}`;
+    }
+
+    function luhnCheck(num){
+      const s = (num||'').replace(/\s|-/g,'');
+      if(!/^\d{13,19}$/.test(s)) return false;
+      let sum = 0, dbl = false;
+      for(let i=s.length-1;i>=0;i--){
+        let d = parseInt(s[i],10);
+        if(dbl){ d*=2; if(d>9) d-=9; }
+        sum += d; dbl = !dbl;
+      }
+      return sum % 10 === 0;
+    }
+
+    function expValid(mmYY){
+      if(!/^(0[1-9]|1[0-2])\/(\d{2})$/.test(mmYY)) return false;
+      const [mm, yy] = mmYY.split('/').map(x=>parseInt(x,10));
+      const year = 2000 + yy;
+      const now = new Date();
+      const exp = new Date(year, mm); // first day of next month
+      return exp > now; // still valid if in the future month
+    }
+
+    function hash(str){
+      // Lightweight demo hash (Base64). Do NOT use in production.
+      return btoa(unescape(encodeURIComponent(str)));
+    }
+
+    function saveUser(u){
+      const key = `user:${u.email.toLowerCase()}`;
+      localStorage.setItem(key, JSON.stringify(u));
+    }
+
+    function getUser(email){
+      return JSON.parse(localStorage.getItem(`user:${(email||'').toLowerCase()}`) || 'null');
+    }
+
+    function setSession(email){
+      if(email) sessionStorage.setItem('currentUser', email.toLowerCase());
+      else sessionStorage.removeItem('currentUser');
+    }
+
+    function getSession(){
+      return sessionStorage.getItem('currentUser');
+    }
+
+    // ---------------------- Register ----------------------
+    const regCard = document.getElementById('reg_card');
+    const regExp = document.getElementById('reg_exp');
+    const regMsg = document.getElementById('reg_msg');
+    const ccPreview = document.getElementById('cc_preview');
+
+    regCard.addEventListener('input', e=>{
+      // Format 1234 5678 9012 3456
+      let v = e.target.value.replace(/\D/g,'').slice(0,19);
+      ccPreview.textContent = maskCard(v);
+      e.target.value = v.replace(/(\d{4})(?=\d)/g,'$1 ').trim();
+    });
+    regExp.addEventListener('input', e=>{
+      let v = e.target.value.replace(/\D/g,'').slice(0,4);
+      if(v.length > 2) v = v.slice(0,2) + '/' + v.slice(2);
+      e.target.value = v;
+    });
+
+    document.getElementById('registerForm').addEventListener('submit', (e)=>{
+      e.preventDefault();
+      regMsg.className = 'hint'; regMsg.textContent = '';
+
+      const name = document.getElementById('reg_name').value.trim();
+      const email = document.getElementById('reg_email').value.trim();
+      const card = regCard.value.replace(/\D/g,'');
+      const exp = regExp.value.trim();
+      const cvv = document.getElementById('reg_cvv').value.trim();
+      const pass = document.getElementById('reg_pass').value;
+      const pass2 = document.getElementById('reg_pass2').value;
+      const terms = document.getElementById('reg_terms').checked;
+
+      // Basic validations
+      if(!name || !email){ return msg(regMsg, 'Please enter name and email.', true); }
+      if(!luhnCheck(card)){ return msg(regMsg, 'Card number failed to check.', true); }
+      if(!expValid(exp)){ return msg(regMsg, 'Expiry must be in the future (MM/YY).', true); }
+      if(!/^\d{3,4}$/.test(cvv)){ return msg(regMsg, 'CVV must be 3–4 digits.', true); }
+      if(pass.length < 6){ return msg(regMsg, 'Password must be at least 6 characters.', true); }
+      if(pass !== pass2){ return msg(regMsg, 'Passwords do not match.', true); }
+      if(!terms){ return msg(regMsg, 'Please accept the demo disclaimer.', true); }
+
+      const user = {
+        name,
+        email,
+        // Store only last4 + brand hint
+        cardLast4: card.slice(-4),
+        cardMasked: maskCard(card),
+        exp,
+        passHash: hash(pass),
+        createdAt: new Date().toISOString()
+      };
+
+      saveUser(user);
+      msg(regMsg, 'Account created! Redirecting to login…', false);
+      setTimeout(()=>{ go('#login'); }, 800);
+    });
+
+    function msg(el, text, isError){
+      el.textContent = text;
+      el.className = isError ? 'error' : 'success';
+    }
+
+    // ---------------------- Login ----------------------
+    const logMsg = document.getElementById('log_msg');
+    document.getElementById('loginForm').addEventListener('submit', (e)=>{
+      e.preventDefault();
+      logMsg.className = 'hint'; logMsg.textContent = '';
+      const email = document.getElementById('log_email').value.trim().toLowerCase();
+      const pass = document.getElementById('log_pass').value;
+      const u = getUser(email);
+      if(!u) return msg(logMsg, 'No account found with that email.', true);
+      if(u.passHash !== hash(pass)) return msg(logMsg, 'Incorrect password.', true);
+      setSession(email);
+      msg(logMsg, 'Login successful! Opening profile…', false);
+      setTimeout(()=>{ go('#profile'); }, 600);
+    });
+
+    function logout(){ setSession(null); go('#login'); }
+
+    // ---------------------- Profile ----------------------
+    function renderProfile(){
+      const email = getSession();
+      const wrap = document.getElementById('profileWrap');
+      const u = getUser(email);
+      if(!u){ wrap.innerHTML = '<div class="error">Session expired. Please log in again.</div>'; return; }
+
+      wrap.innerHTML = `
+        <div class="profile-row"><div>Email</div><div>${u.email}</div></div>
+        <div class="profile-row"><div>Name</div><div>${u.name}</div></div>
+        <div class="profile-row"><div>Card</div><div>${u.cardMasked}</div></div>
+        <div class="profile-row"><div>Expiry</div><div>${u.exp}</div></div>
+        <div class="profile-row"><div>Member Since</div><div>${new Date(u.createdAt).toLocaleString()}</div></div>
+      `;
+    }
+
+    // ---------------------- Diagnostics ----------------------
+    function runTests(){
+      const out = [];
+      function pass(name){ out.push(`✅ ${name}`); }
+      function fail(name, msg){ out.push(`❌ ${name} — ${msg}`); }
+
+      // Routing fallback should not throw
+      try {
+        // Force fallback path by temporarily pretending pushState is unusable
+        const was = window.history && history.pushState;
+        // (We can't monkeypatch native methods reliably in all browsers; instead just call go and ensure no throw.)
+        go('#login');
+        go('#register');
+        pass('Routing: go() does not throw in sandbox');
+      } catch(e){ fail('Routing: go() in sandbox', e && e.message || String(e)); }
+
+      // Luhn tests (common test numbers)
+      const validCards = ['4111 1111 1111 1111','4242424242424242','4012888888881881','5555 5555 5555 4444'];
+      const invalidCards = ['0000 0000 0000 0000','1234567890123456','9999 9999 9999 9999'];
+      try {
+        const vAll = validCards.every(c=>luhnCheck(c));
+        const iAll = invalidCards.every(c=>!luhnCheck(c));
+        vAll ? pass('Luhn: valid card numbers accepted') : fail('Luhn valid set','One or more valid numbers rejected');
+        iAll ? pass('Luhn: invalid card numbers rejected') : fail('Luhn invalid set','One or more invalid numbers accepted');
+      } catch(e){ fail('Luhn checks threw', e.message); }
+
+      // Expiry tests
+      try {
+        // Build a valid future expiry: next month
+        const now = new Date();
+        const mm = String(((now.getMonth()+2) % 12) || 12).padStart(2,'0');
+        const yy = String((now.getFullYear()%100) + (now.getMonth()===10?1:0)).padStart(2,'0');
+        const future = `${mm}/${yy}`;
+        const past = '01/20';
+        expValid(future) ? pass(`Expiry: future (${future}) accepted`) : fail('Expiry future','future date rejected');
+        !expValid(past) ? pass('Expiry: past (01/20) rejected') : fail('Expiry past','past date accepted');
+      } catch(e){ fail('Expiry checks threw', e.message); }
+
+      // Masking test
+      try {
+        const m = maskCard('4111111111111111');
+        m.endsWith('1111') && m.startsWith('••••') ? pass('Mask: preserves last4 and masks others') : fail('Mask','Unexpected format: '+m);
+      } catch(e){ fail('Masking threw', e.message); }
+
+      // Profile auth gate
+      try {
+        setSession(null);
+        go('#profile');
+        const loginVisible = !document.getElementById('login').hidden;
+        loginVisible ? pass('Auth gate: redirects profile->login when not logged in') : fail('Auth gate','Login not shown');
+        go('#register');
+      } catch(e){ fail('Auth gate threw', e.message); }
+
+      document.getElementById('test_output').textContent = out.join('\n');
+    }
+
+    function resetDemo(){
+      Object.keys(localStorage).filter(k=>k.startsWith('user:')).forEach(k=>localStorage.removeItem(k));
+      sessionStorage.removeItem('currentUser');
+      document.getElementById('test_output').textContent = 'Demo data cleared.';
+      go('#register');
+    }
+
+    // ---------------------- Init ----------------------
+    document.querySelectorAll('.tab').forEach(btn=>{
+      btn.addEventListener('click', ()=> go(btn.dataset.route));
+    });
+    // Initial render
+    renderRoute();
+  </script>
+</body>
+</html>
